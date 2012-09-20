@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+
+var rhizome = require('..');
+var pegjs = require('pegjs');
+var fs = require('fs');
+
+var usage = 'Usage: rhizome routes.pegjs [/uri/path/to/test]';
+
+var filename = process.argv[2];
+var uri = process.argv[3];
+
+if (process.argv.length < 3) {
+  console.log(usage);
+  process.exit(1);
+}
+
+
+var grammar = fs.readFileSync(filename, 'utf8');
+
+try {
+  var parser = pegjs.buildParser(grammar);
+}
+catch (e) {
+  console.log(e);
+  process.exit(2);
+}
+
+var config = {
+  parser: parser,
+  debug: true
+};
+
+// var router = rhizome(config);
+
+if (uri) {
+  var parsetree = rhizome.parse(config, uri + '#');
+  var leaf = rhizome.resolve(parsetree).node;
+  console.log(leaf);
+}
+
+//  var rhizome = require('rhizome');
+//  var resources = require('./resources');
+//  var grammar = 'a valid peg.js grammar';
+//
+//
+//  app.use(rhizome({
+//    parser: parser,
+//    resources: resources
+//  }));

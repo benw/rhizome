@@ -1,0 +1,26 @@
+{
+  "name": "rhizome",
+  "version": "0.1.0",
+  "description": "Use a peg.js grammar to route url requests",
+  "author": {
+    "name": "Ben Williamson",
+    "email": "benw@pobox.com"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/benw/rhizome.git"
+  },
+  "dependencies": {
+    "pegjs": "0.7.x"
+  },
+  "devDependencies": {
+    "mocha": "1.4.x",
+    "supertest": "0.2.x",
+    "chai": "1.2.x"
+  }
+}
