@@ -1,6 +1,6 @@
 {
   "name": "rhizome",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Use a peg.js grammar to route url requests",
   "author": {
     "name": "Ben Williamson",

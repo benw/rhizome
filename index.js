@@ -2,55 +2,6 @@ var util = require('util');
 var url = require('url');
 var pegjs = require('pegjs');
 
-//
-// Rhizome
-//
-// A connect/express middleware for dispatching requests to a
-// hierarchy of resources, using a grammar to describe the
-// structure of the url hierarchy.
-//
-// Synopsis:
-//
-//  var rhizome = require('rhizome');
-//  var resources = require('./resources');
-//  var grammar = 'a valid peg.js grammar';
-//
-//  var parser = rhizome.pegjs.buildParser(grammar);
-//
-//  app.use(rhizome({
-//    parser: parser,
-//    resources: resources
-//  }));
-//
-// You construct a pegjs parser from the given grammar.
-// Then for each request passed to this middleware, the parser
-// is given req.url as input, and the resulting parse tree is
-// traversed to resolve the request to a resource. See also the
-// comments for rhizome.resolve, below.
-//
-// config fields:
-//
-//  parser        A pegjs-compatible parser object,
-//                having parser.parse(input, [startRule])
-//
-//  resources     An object holding resource constructors.
-//                tree resolves a leaf resource.
-//
-//  [makeinput]   Function to extract from a request the input
-//                to be parsed. Defaults to rhizome.makeinput
-//
-//  [startRule]   The name of the start rule in the grammar.
-//                Defaults to the first declared rule.
-//
-//
-//  [parse]       Function to parse a request into a parse tree.
-//                Defaults to rhizome.parse.
-//
-//  [dispatch]    Function to dispatch a request against
-//                a resource. Defaults to rhizome.dispatch.
-//
-//  [debug]       True to log parse errors. Defaults to false.
-//
 var rhizome = module.exports = function rhizome(config) {
   var parse = config.parse || rhizome.parse;
   var dispatch = config.dispatch || rhizome.dispatch;
@@ -100,7 +51,7 @@ rhizome.pegjs = pegjs;
 // for example to construct input based on req.hostname and req.url.
 //
 rhizome.makeinput = function makeinput(req) {
-  return req.url + '#';
+  return req.url;
 };
 
 //
