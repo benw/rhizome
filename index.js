@@ -1,5 +1,6 @@
 var util = require('util');
 var url = require('url');
+var pegjs = require('pegjs');
 
 //
 // Rhizome
@@ -11,11 +12,10 @@ var url = require('url');
 // Synopsis:
 //
 //  var rhizome = require('rhizome');
-//  var pegjs = require('pegjs');
 //  var resources = require('./resources');
 //  var grammar = 'a valid peg.js grammar';
 //
-//  var parser = pegjs.buildParser(grammar);
+//  var parser = rhizome.pegjs.buildParser(grammar);
 //
 //  app.use(rhizome({
 //    parser: parser,
@@ -78,7 +78,7 @@ var rhizome = module.exports = function rhizome(config) {
       var result = getResource(path + '/', relpath);
       return result ? result.resource : null;
     }
-    result.resource = new Constructor(path, result.node, select);
+    result.resource = new Constructor(result.node, path, select);
     return result;
   }
   return function (req, res, next) {
@@ -88,9 +88,10 @@ var rhizome = module.exports = function rhizome(config) {
     } else {
       next();
     }
-
   };
 };
+
+rhizome.pegjs = pegjs;
 
 //
 // rhizome.makeinput

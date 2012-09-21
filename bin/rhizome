@@ -33,17 +33,7 @@ var config = {
 // var router = rhizome(config);
 
 if (uri) {
-  var parsetree = rhizome.parse(config, uri + '#');
+  var parsetree = rhizome.parse(config, uri + '\n');
   var leaf = rhizome.resolve(parsetree).node;
   console.log(leaf);
 }
-
-//  var rhizome = require('rhizome');
-//  var resources = require('./resources');
-//  var grammar = 'a valid peg.js grammar';
-//
-//
-//  app.use(rhizome({
-//    parser: parser,
-//    resources: resources
-//  }));
