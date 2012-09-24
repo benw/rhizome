@@ -1,44 +1,20 @@
 var util = require('util');
-var url = require('url');
 var pegjs = require('pegjs');
 
 var rhizome = module.exports = function rhizome(config) {
   var parse = config.parse || rhizome.parse;
   var dispatch = config.dispatch || rhizome.dispatch;
   var makeinput = config.makeinput || rhizome.makeinput;
-  function getResource(base, selector) {
-    var input = url.resolve(base, selector);
-    var tree = parse(config, input);
-    if (!tree) {
-      return null;
-    }
-    var result = rhizome.resolve(tree);
-    if (!result.node) {
-      return null;
-    }
-    var path = result.suffix ?
-          input.slice(0, -result.suffix.length) :
-          input;
-    var type = result.node.type;
-    var Constructor = config.resources[type];
-    if (!(Constructor && Constructor instanceof Function)) {
-      throw new TypeError('Unknown resource type ' +
-                util.inspect(type));
-    }
-    function select(relpath) {
-      var result = getResource(path + '/', relpath);
-      return result ? result.resource : null;
-    }
-    result.resource = new Constructor(result.node, path, select);
-    return result;
-  }
+
   return function (req, res, next) {
-    var result = getResource('', makeinput(req), req);
-    if (result && result.resource) {
-      dispatch(config, result, req, res, next);
-    } else {
-      next();
-    }
+    var input = makeinput(req);
+    var node = parse(config, input);
+    config.factory(node, function (err, resource) {
+      if (err) {
+        return next(err);
+      }
+      dispatch(config, resource, req, res, next);
+    });
   };
 };
 
@@ -94,7 +70,7 @@ rhizome.parse = function parse(config, input) {
 //
 // rhizome.dispatch
 //
-// Dispatch a request against the resolved resource object.
+// Dispatch a request against a resource object.
 //
 // It looks for a method on the resource object having the same name as the
 // http verb of the request, i.e. resource.get, resource.post etc, or
@@ -106,9 +82,7 @@ rhizome.parse = function parse(config, input) {
 //
 //  config      The config object that was passed to rhizome.
 //
-//  result      The result of resolving against the parse tree.
-//              result.resource is the resource object.
-//              result.suffix is the url portion following the resource's path.
+//  resource    The resource constructed by the factory.
 //
 //  req,res,next The request and response objects and the next function passed
 //              to this middleware for this request. Each call to dispatch
@@ -116,11 +90,9 @@ rhizome.parse = function parse(config, input) {
 //              res.send, res.render etc) or next(err).
 //
 //
-rhizome.dispatch = function (config, result, req, res, next) {
-  var resource = result.resource;
-  var suffix = result.suffix;
+rhizome.dispatch = function (config, resource, req, res, next) {
   if (!resource) {
-    // No error but resolved to a null resource - fall through silently.
+    // No error but null resource - fall through silently.
     if (config.debug) {
       console.log(req.url + ' resolved to null resource');
     }
@@ -131,49 +103,9 @@ rhizome.dispatch = function (config, result, req, res, next) {
   }
   var fn = resource[req.method.toLowerCase()] || resource.all;
   if ('function' === typeof fn) {
-    fn.call(resource, req, res, next, suffix);
+    fn.call(resource, req, res, next);
   } else {
-    res.send('Resource at ' + req.url +
-        ' does not implement ' + req.method + '\r\n', 404);
-  }
-};
-
-//
-// rhizome.resolve
-//
-// Resolve from resourceRoot to a resource selected by the parse tree.
-//
-// The parser returns a parse tree representing the url. This is
-// a tree of nested arrays.
-//
-// Returns:
-//
-//  {
-//    node: // the last object in the tree, or null if none.
-//    suffix: // string component of the url following node
-//  }
-//
-rhizome.resolve = function resolve(tree) {
-  if (Array.isArray(tree)) {
-    var node;
-    var suffix = '';
-    for (var i = tree.length - 1; !node && i >= 0; i--) {
-      var branch = resolve(tree[i]);
-      node = branch.node;
-      suffix = branch.suffix + suffix;
-    }
-    return {
-      node: node,
-      suffix: suffix
-    };
-  } else if ('string' === typeof tree) {
-    return {
-      suffix: tree
-    };
-  } else {
-    return {
-      node: tree,
-      suffix: ''
-    };
+    res.send(404, 'Resource at ' + req.url +
+        ' does not implement ' + req.method + '\r\n');
   }
 };
