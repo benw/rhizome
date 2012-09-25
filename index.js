@@ -93,9 +93,6 @@ rhizome.parse = function parse(config, input) {
 rhizome.dispatch = function (config, resource, req, res, next) {
   if (!resource) {
     // No error but null resource - fall through silently.
-    if (config.debug) {
-      console.log(req.url + ' resolved to null resource');
-    }
     return next();
   }
   if ('object' !== typeof resource) {
