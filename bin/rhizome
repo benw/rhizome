@@ -33,7 +33,6 @@ var config = {
 // var router = rhizome(config);
 
 if (uri) {
-  var parsetree = rhizome.parse(config, uri + '\n');
-  var leaf = rhizome.resolve(parsetree).node;
-  console.log(leaf);
+  var parsetree = rhizome.parse(config, uri);
+  console.log(parsetree);
 }
