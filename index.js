@@ -98,7 +98,11 @@ rhizome.dispatch = function (config, resource, req, res, next) {
   if ('object' !== typeof resource) {
     return next(new TypeError('resource is not an object'));
   }
-  var fn = resource[req.method.toLowerCase()] || resource.all;
+  var method = req.method.toLowerCase();
+  var fn = resource[method] || resource.all;
+  if (!fn && method === 'head') {
+    fn = resource['get'];
+  }
   if ('function' === typeof fn) {
     fn.call(resource, req, res, next);
   } else {
