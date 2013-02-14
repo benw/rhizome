@@ -1,6 +1,6 @@
 {
   "name": "rhizome",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Use a peg.js grammar to route url requests",
   "author": {
     "name": "Ben Williamson",
@@ -17,10 +17,5 @@
   },
   "dependencies": {
     "pegjs": "0.7.x"
-  },
-  "devDependencies": {
-    "mocha": "1.4.x",
-    "supertest": "0.2.x",
-    "chai": "1.2.x"
   }
 }

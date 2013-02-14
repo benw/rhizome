@@ -9,7 +9,7 @@ var rhizome = module.exports = function rhizome(config) {
   return function (req, res, next) {
     var input = makeinput(req);
     var node = parse(config, input);
-    config.factory(node, function (err, resource) {
+    config.factory(req, node, function (err, resource) {
       if (err) {
         return next(err);
       }
